@@ -37,6 +37,11 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
+                <Link to="/pricing" className="text-gray-400 hover:text-primary transition-colors">
+                  Pricing
+                </Link>
+              </li>
+              <li>
                 <Link to="/search" className="text-gray-400 hover:text-primary transition-colors">
                   Find Gyms
                 </Link>
@@ -49,28 +54,28 @@ export default function Footer() {
             </ul>
           </div>
 
-          {/* Support */}
+          {/* Legal & Support */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Support</h3>
+            <h3 className="text-lg font-semibold mb-4">Legal & Support</h3>
             <ul className="space-y-2">
               <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                  About Us
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                  Contact
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
+                <Link to="/privacy-policy" className="text-gray-400 hover:text-primary transition-colors">
                   Privacy Policy
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-400 hover:text-primary transition-colors">
-                  Terms of Service
+                <Link to="/terms-and-conditions" className="text-gray-400 hover:text-primary transition-colors">
+                  Terms & Conditions
+                </Link>
+              </li>
+              <li>
+                <Link to="/refund-policy" className="text-gray-400 hover:text-primary transition-colors">
+                  Refund Policy
+                </Link>
+              </li>
+              <li>
+                <a href="mailto:support@gymmer.com" className="text-gray-400 hover:text-primary transition-colors">
+                  Contact Support
                 </a>
               </li>
             </ul>

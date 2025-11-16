@@ -83,7 +83,11 @@ VITE_RAZORPAY_KEY_ID=rzp_test_RgUTSG12jeSuAf
 1. Visit your live site
 2. Click "View Pricing"
 3. See ₹10 one-time offer
-4. Test payment with: 4111 1111 1111 1111
+4. Test payment with:
+   Card: 4111 1111 1111 1111
+   CVV: 123
+   Expiry: 12/25
+   (No test account needed!)
 5. Verify you get instant access
 6. Test all filters work
 7. Check mobile view

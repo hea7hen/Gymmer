@@ -11,6 +11,9 @@ import Saved from './pages/Saved';
 import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Pricing from './pages/Pricing';
+import PrivacyPolicy from './pages/PrivacyPolicy';
+import TermsAndConditions from './pages/TermsAndConditions';
+import RefundPolicy from './pages/RefundPolicy';
 import AdminDashboard from './pages/admin/Dashboard';
 import ManageGyms from './pages/admin/ManageGyms';
 import EditGym from './pages/admin/EditGym';
@@ -35,6 +38,9 @@ function App() {
               <Routes>
                 <Route path="/" element={<Home />} />
                 <Route path="/pricing" element={<Pricing />} />
+                <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+                <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+                <Route path="/refund-policy" element={<RefundPolicy />} />
                 <Route path="/search" element={
                   <ProtectedRoute>
                     <Search />
