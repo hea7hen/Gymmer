@@ -46,7 +46,7 @@ export default function ProtectedRoute({ children }: ProtectedRouteProps) {
           <div className="bg-gray-50 rounded-xl p-6 mb-8">
             <div className="flex items-center justify-center gap-3 text-primary font-semibold mb-4">
               <CreditCard className="w-6 h-6" />
-              <span className="text-2xl">Starting at ₹99/month</span>
+              <span className="text-3xl">Just ₹10 one-time!</span>
             </div>
             <ul className="text-left space-y-2 text-gray-600 max-w-md mx-auto">
               <li className="flex items-center">

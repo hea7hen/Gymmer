@@ -2,7 +2,7 @@ import SearchBar from '../components/SearchBar';
 import GymCard from '../components/GymCard';
 import { LoadingSkeleton } from '../components/Loading';
 import { useFeaturedGyms } from '../hooks/useGyms';
-import { Target, DollarSign, Heart, MapPin, Check, TrendingUp } from 'lucide-react';
+import { Target, DollarSign, Heart, MapPin, Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
 export default function Home() {

@@ -53,16 +53,12 @@ export default function Pricing() {
 
     try {
       // Create subscription record in Firestore
-      const endDate = new Date();
-      endDate.setDate(endDate.getDate() + (plan.duration === 'monthly' ? 30 : 365));
-
       const subscriptionRef = await addDoc(collection(db, 'subscriptions'), {
         userId: user.id,
-        planType: plan.duration,
+        planType: 'lifetime' as const,
         amount: plan.price,
-        status: 'created',
-        startDate: Timestamp.now(),
-        endDate: Timestamp.fromDate(endDate),
+        status: 'created' as const,
+        purchaseDate: Timestamp.now(),
         createdAt: Timestamp.now(),
       });
 
@@ -125,10 +121,10 @@ export default function Pricing() {
             You Have Active Subscription!
           </h1>
           <p className="text-gray-600 mb-2">
-            Plan: <span className="font-semibold">{subscription.planType === 'monthly' ? 'Monthly' : 'Annual'}</span>
+            Plan: <span className="font-semibold">Lifetime Access</span>
           </p>
           <p className="text-gray-600 mb-8">
-            Valid until: <span className="font-semibold">{subscription.endDate.toDate().toLocaleDateString()}</span>
+            Purchased: <span className="font-semibold">{subscription.purchaseDate.toDate().toLocaleDateString()}</span>
           </p>
           <button
             onClick={() => navigate('/search')}
@@ -147,15 +143,15 @@ export default function Pricing() {
         {/* Header */}
         <div className="text-center mb-16">
           <h1 className="text-5xl font-extra-bold text-gray-900 mb-4">
-            Choose Your Plan
+            Get Lifetime Access
           </h1>
           <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            Get unlimited access to 70+ verified gyms across Bangalore. Compare prices, save favorites, and find your perfect fitness match.
+            One-time payment of just ₹10 for unlimited lifetime access to 70+ verified gyms across Bangalore!
           </p>
         </div>
 
-        {/* Pricing Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        {/* Pricing Card */}
+        <div className="max-w-xl mx-auto">
           {PRICING_PLANS.map((plan) => (
             <div
               key={plan.id}
@@ -174,14 +170,12 @@ export default function Pricing() {
               <div className="text-center mb-8">
                 <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
                 <div className="flex items-baseline justify-center mb-4">
-                  <span className="text-5xl font-extra-bold text-primary">₹{plan.price}</span>
-                  <span className="text-gray-600 ml-2">/{plan.duration === 'monthly' ? 'month' : 'year'}</span>
+                  <span className="text-6xl font-extra-bold text-primary">₹{plan.price}</span>
+                  <span className="text-gray-600 ml-2 text-xl">only</span>
                 </div>
-                {plan.duration === 'annual' && (
-                  <p className="text-sm text-green-600 font-semibold">
-                    Save ₹189 compared to monthly
-                  </p>
-                )}
+                <p className="text-sm text-green-600 font-semibold">
+                  🎉 One-time payment, lifetime access!
+                </p>
               </div>
 
               <ul className="space-y-4 mb-8">
@@ -236,9 +230,9 @@ export default function Pricing() {
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-2">Can I cancel anytime?</h3>
+              <h3 className="font-bold text-gray-900 mb-2">Is it really just ₹10?</h3>
               <p className="text-gray-600">
-                Yes! Your subscription is valid for the period you paid for. It won't auto-renew.
+                Yes! Just ₹10 one-time payment gives you lifetime access. No recurring charges, no subscriptions.
               </p>
             </div>
             <div className="bg-white rounded-lg p-6 shadow-sm">
