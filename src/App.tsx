@@ -14,6 +14,8 @@ import Pricing from './pages/Pricing';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import TermsAndConditions from './pages/TermsAndConditions';
 import RefundPolicy from './pages/RefundPolicy';
+import ShippingPolicy from './pages/ShippingPolicy';
+import ContactUs from './pages/ContactUs';
 import AdminDashboard from './pages/admin/Dashboard';
 import ManageGyms from './pages/admin/ManageGyms';
 import EditGym from './pages/admin/EditGym';
@@ -41,6 +43,8 @@ function App() {
                 <Route path="/privacy-policy" element={<PrivacyPolicy />} />
                 <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
                 <Route path="/refund-policy" element={<RefundPolicy />} />
+                <Route path="/shipping-policy" element={<ShippingPolicy />} />
+                <Route path="/contact-us" element={<ContactUs />} />
                 <Route path="/search" element={
                   <ProtectedRoute>
                     <Search />

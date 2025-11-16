@@ -74,9 +74,14 @@ export default function Footer() {
                 </Link>
               </li>
               <li>
-                <a href="mailto:support@gymmer.com" className="text-gray-400 hover:text-primary transition-colors">
-                  Contact Support
-                </a>
+                <Link to="/shipping-policy" className="text-gray-400 hover:text-primary transition-colors">
+                  Shipping & Delivery
+                </Link>
+              </li>
+              <li>
+                <Link to="/contact-us" className="text-gray-400 hover:text-primary transition-colors">
+                  Contact Us
+                </Link>
               </li>
             </ul>
           </div>

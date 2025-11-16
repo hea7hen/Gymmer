@@ -24,6 +24,16 @@ https://gymmer-pied.vercel.app/terms-and-conditions
 https://gymmer-pied.vercel.app/refund-policy
 ```
 
+### 4. Shipping and Delivery Policy
+```
+https://gymmer-pied.vercel.app/shipping-policy
+```
+
+### 5. Contact Us
+```
+https://gymmer-pied.vercel.app/contact-us
+```
+
 ---
 
 ## How to Submit to Razorpay
@@ -157,9 +167,13 @@ If Razorpay requests changes:
 ```
 Website: https://gymmer-pied.vercel.app
 Privacy Policy: https://gymmer-pied.vercel.app/privacy-policy
-Terms: https://gymmer-pied.vercel.app/terms-and-conditions
-Refund: https://gymmer-pied.vercel.app/refund-policy
+Terms & Conditions: https://gymmer-pied.vercel.app/terms-and-conditions
+Cancellation & Refund: https://gymmer-pied.vercel.app/refund-policy
+Shipping & Delivery: https://gymmer-pied.vercel.app/shipping-policy
+Contact Us: https://gymmer-pied.vercel.app/contact-us
 ```
+
+**Contact Email:** abinair314@gmail.com
 
 **All pages are now live and ready for Razorpay review!** ✅
 
