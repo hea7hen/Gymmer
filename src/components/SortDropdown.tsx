@@ -1,7 +1,7 @@
 import { ChevronDown } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 
-export type SortOption = 'featured' | 'price-low' | 'price-high' | 'area' | 'newest';
+export type SortOption = 'price-low' | 'price-high' | 'area';
 
 interface SortDropdownProps {
   value: SortOption;
@@ -9,11 +9,9 @@ interface SortDropdownProps {
 }
 
 const SORT_OPTIONS: { value: SortOption; label: string }[] = [
-  { value: 'featured', label: 'Featured First' },
   { value: 'price-low', label: 'Price: Low to High' },
   { value: 'price-high', label: 'Price: High to Low' },
   { value: 'area', label: 'Neighborhood (A-Z)' },
-  { value: 'newest', label: 'Newly Added' },
 ];
 
 export default function SortDropdown({ value, onChange }: SortDropdownProps) {

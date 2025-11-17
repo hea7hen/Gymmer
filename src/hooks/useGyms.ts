@@ -17,7 +17,7 @@ export function useGyms(filters?: {
   maxPrice?: number;
   amenities?: string[];
   gymTypes?: string[];
-  sortBy?: 'featured' | 'price-low' | 'price-high' | 'area' | 'newest';
+  sortBy?: 'price-low' | 'price-high' | 'area';
 }) {
   return useQuery({
     queryKey: ['gyms', filters],
@@ -31,12 +31,8 @@ export function useGyms(filters?: {
       }
       
       // Sorting
-      if (filters?.sortBy === 'featured') {
-        constraints.push(orderBy('isPremium', 'desc'));
-      } else if (filters?.sortBy === 'area') {
+      if (filters?.sortBy === 'area') {
         constraints.push(orderBy('area', 'asc'));
-      } else if (filters?.sortBy === 'newest') {
-        constraints.push(orderBy('createdAt', 'desc'));
       }
       
       const gymsQuery = query(collection(db, 'gyms'), ...constraints);

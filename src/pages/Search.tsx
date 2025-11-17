@@ -19,7 +19,7 @@ export default function Search() {
   const [priceRange, setPriceRange] = useState<[number, number]>([350, 9000]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [selectedGymTypes, setSelectedGymTypes] = useState<string[]>([]);
-  const [sortBy, setSortBy] = useState<SortOption>('featured');
+  const [sortBy, setSortBy] = useState<SortOption>('price-low');
   const [page, setPage] = useState(1);
   const itemsPerPage = 12;
 
@@ -43,7 +43,7 @@ export default function Search() {
     maxPrice: hasCustomPriceRange ? priceRange[1] : undefined,
     amenities: selectedAmenities.length > 0 ? selectedAmenities : undefined,
     gymTypes: selectedGymTypes.length > 0 ? selectedGymTypes : undefined,
-    sortBy,
+    sortBy: sortBy as 'price-low' | 'price-high' | 'area',
   });
 
   // Pagination

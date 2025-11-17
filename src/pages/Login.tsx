@@ -20,7 +20,24 @@ export default function Login() {
       await signIn(email, password);
       navigate('/');
     } catch (err: any) {
-      setError(err.message || 'Failed to login');
+      // Provide user-friendly error messages
+      let errorMessage = 'Failed to login';
+      
+      if (err.code === 'auth/invalid-credential') {
+        errorMessage = 'Invalid email or password. Please check your credentials or sign up if you don\'t have an account.';
+      } else if (err.code === 'auth/user-not-found') {
+        errorMessage = 'No account found with this email. Please sign up first.';
+      } else if (err.code === 'auth/wrong-password') {
+        errorMessage = 'Incorrect password. Please try again.';
+      } else if (err.code === 'auth/invalid-email') {
+        errorMessage = 'Invalid email address. Please check your email format.';
+      } else if (err.code === 'auth/operation-not-allowed') {
+        errorMessage = 'Email/Password authentication is not enabled. Please contact support.';
+      } else if (err.message) {
+        errorMessage = err.message;
+      }
+      
+      setError(errorMessage);
     } finally {
       setLoading(false);
     }
