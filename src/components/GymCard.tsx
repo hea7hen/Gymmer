@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
-import { MapPin, Heart, CheckCircle } from 'lucide-react';
+import { MapPin, Heart, CheckCircle, Star } from 'lucide-react';
 import { Gym } from '../types/gym';
-import { formatPrice, getAmenityIcon } from '../lib/utils';
+import { formatPrice, getAmenityIcon, getAmenityLabel, generateGymImage } from '../lib/utils';
 import { useSavedGyms } from '../hooks/useSavedGyms';
 import { useAuth } from '../hooks/useAuth';
 
@@ -33,10 +33,17 @@ export default function GymCard({ gym }: GymCardProps) {
       {/* Image */}
       <div className="relative h-48 overflow-hidden rounded-t-xl">
         <img
-          src={gym.coverImage}
+          src={gym.coverImage || generateGymImage(gym.name, gym.area)}
           alt={gym.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
+          onError={(e) => {
+            // Fallback to generated image if coverImage fails
+            const target = e.target as HTMLImageElement;
+            if (target.src !== generateGymImage(gym.name, gym.area)) {
+              target.src = generateGymImage(gym.name, gym.area);
+            }
+          }}
         />
         
         {/* Badges */}
@@ -71,9 +78,19 @@ export default function GymCard({ gym }: GymCardProps) {
           {gym.name}
         </h3>
         
-        <div className="flex items-center text-gray-600 mb-3">
-          <MapPin className="w-4 h-4 mr-1" />
-          <span className="text-sm">{gym.area}</span>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center text-gray-600">
+            <MapPin className="w-4 h-4 mr-1 text-primary" />
+            <span className="text-sm font-medium">{gym.area}</span>
+          </div>
+          
+          {/* Rating */}
+          {gym.rating > 0 && (
+            <div className="flex items-center gap-1 bg-yellow-50 px-2 py-1 rounded-full">
+              <Star className="w-3.5 h-3.5 fill-yellow-400 text-yellow-400" />
+              <span className="text-xs font-semibold text-gray-700">{gym.rating.toFixed(1)}</span>
+            </div>
+          )}
         </div>
 
         {/* Price */}
@@ -90,19 +107,22 @@ export default function GymCard({ gym }: GymCardProps) {
           )}
         </div>
 
-        {/* Amenities */}
-        <div className="flex gap-2 flex-wrap">
+        {/* Amenities - Larger with tooltips */}
+        <div className="flex gap-2 flex-wrap items-center">
           {gym.amenities.slice(0, 4).map((amenity) => (
             <span
               key={amenity}
-              className="text-lg"
-              title={amenity}
+              className="text-2xl cursor-help relative group"
+              title={getAmenityLabel(amenity)}
             >
               {getAmenityIcon(amenity)}
+              <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 bg-gray-900 text-white text-xs rounded whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-10">
+                {getAmenityLabel(amenity)}
+              </span>
             </span>
           ))}
           {gym.amenities.length > 4 && (
-            <span className="text-sm text-gray-600">+{gym.amenities.length - 4} more</span>
+            <span className="text-sm text-gray-600 font-medium">+{gym.amenities.length - 4} more</span>
           )}
         </div>
       </div>

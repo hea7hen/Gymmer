@@ -1,12 +1,22 @@
-import { Link } from 'react-router-dom';
-import { Menu, X, User, LogOut, Heart, Settings } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Menu, X, User, LogOut, Heart, Settings, Search } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const { user, signOut } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      navigate(`/search?area=${encodeURIComponent(searchQuery.trim())}`);
+      setSearchQuery('');
+    }
+  };
 
   return (
     <header className="bg-primary shadow-lg sticky top-0 z-50">
@@ -18,23 +28,38 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            <Link to="/" className="text-cream hover:text-white transition-colors font-semibold">
+          <div className="hidden md:flex items-center space-x-6 flex-1 max-w-2xl mx-8">
+            <Link to="/" className="text-cream hover:text-white transition-colors font-semibold whitespace-nowrap">
               Home
             </Link>
-            <Link to="/pricing" className="text-cream hover:text-white transition-colors font-semibold">
+            <Link to="/pricing" className="text-cream hover:text-white transition-colors font-semibold whitespace-nowrap">
               Pricing
             </Link>
-            <Link to="/search" className="text-cream hover:text-white transition-colors font-semibold">
+            <Link to="/search" className="text-cream hover:text-white transition-colors font-semibold whitespace-nowrap">
               Find Gyms
             </Link>
+            
+            {/* Search Bar */}
+            <form onSubmit={handleSearch} className="flex-1 max-w-md">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cream/70 w-4 h-4" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by area..."
+                  className="w-full pl-10 pr-4 py-2 bg-cream/20 border border-cream/30 rounded-lg text-cream placeholder-cream/60 focus:outline-none focus:ring-2 focus:ring-cream focus:border-cream text-sm"
+                />
+              </div>
+            </form>
+            
             {user && (
-              <Link to="/saved" className="text-cream hover:text-white transition-colors font-semibold">
+              <Link to="/saved" className="text-cream hover:text-white transition-colors font-semibold whitespace-nowrap">
                 Saved
               </Link>
             )}
             {user?.isAdmin && (
-              <Link to="/admin" className="text-cream hover:text-white transition-colors font-semibold">
+              <Link to="/admin" className="text-cream hover:text-white transition-colors font-semibold whitespace-nowrap">
                 Admin
               </Link>
             )}
@@ -116,6 +141,20 @@ export default function Header() {
         {/* Mobile Navigation */}
         {mobileMenuOpen && (
           <div className="md:hidden py-4 border-t border-primary-dark">
+            {/* Mobile Search */}
+            <form onSubmit={handleSearch} className="mb-4">
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-cream/70 w-4 h-4" />
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Search by area..."
+                  className="w-full pl-10 pr-4 py-2 bg-cream/20 border border-cream/30 rounded-lg text-cream placeholder-cream/60 focus:outline-none focus:ring-2 focus:ring-cream focus:border-cream text-sm"
+                />
+              </div>
+            </form>
+            
             <div className="flex flex-col space-y-4">
               <Link
                 to="/"
