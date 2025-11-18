@@ -1,3 +1,9 @@
+import clsx from 'clsx';
+
+export function cn(...inputs: (string | undefined | null | boolean)[]): string {
+  return clsx(inputs);
+}
+
 export function generateSlug(name: string): string {
   return name
     .toLowerCase()
@@ -54,28 +60,30 @@ export function getAmenityLabel(amenityId: string): string {
 }
 
 /**
- * Generate a unique gym image based on gym name/area
- * Uses a hash of the name to select from different Unsplash gym images
+ * Generate a unique gym image based on gym ID/name/area
+ * Uses a hash of the ID to ensure each gym gets a unique image
  */
-export function generateGymImage(gymName: string, area?: string): string {
-  // Create a simple hash from the gym name
-  let hash = 0;
-  const str = (gymName + (area || '')).toLowerCase();
+export function generateGymImage(gymId: string, gymName?: string, area?: string): string {
+  // Create a more robust hash from the gym ID (which is unique)
+  // Using djb2 hash algorithm for better distribution
+  let hash = 5381;
+  const str = (gymId + (gymName || '') + (area || '')).toLowerCase();
   for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-    hash = hash & hash; // Convert to 32bit integer
+    hash = ((hash << 5) + hash) + str.charCodeAt(i);
   }
   
-  // Array of gym images - using local images in repeating order
-  // Based on the 7 provided gym photos, cycling through them
+  // Array of gym images - using local webp images in repeating order
+  // Using gym-1.webp through gym-9.webp
   const gymImages = [
-    '/gym-1.jpg', // Modern gym with large windows and city view
-    '/gym-2.jpg', // TRX suspension training area with red rig
-    '/gym-3.jpg', // Black and white gym with mirrors and weight benches
-    '/gym-4.jpg', // Free weights area with red-ringed dumbbells
-    '/gym-5.jpg', // Active gym with people on treadmills
-    '/gym-6.jpg', // Functional gym with blue and pink mats
-    '/gym-7.jpg', // Modern gym with people running on treadmills
+    '/gym-1.webp',
+    '/gym-2.webp',
+    '/gym-3.webp',
+    '/gym-4.webp',
+    '/gym-5.webp',
+    '/gym-6.webp',
+    '/gym-7.webp',
+    '/gym-8.webp',
+    '/gym-9.webp',
   ];
   
   // Use absolute value of hash to select image

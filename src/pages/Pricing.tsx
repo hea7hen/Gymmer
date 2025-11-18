@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Check, Loader } from 'lucide-react';
+import { Check, Loader, Star } from 'lucide-react';
+import { motion } from 'framer-motion';
 import { useAuth } from '../hooks/useAuth';
 import { useSubscription } from '../hooks/useSubscription';
 import { PRICING_PLANS, PricingPlan } from '../types/subscription';
 import { collection, addDoc, Timestamp, doc, updateDoc } from 'firebase/firestore';
 import { db } from '../lib/firebase';
+import { cn } from '../lib/utils';
 
 declare global {
   interface Window {
@@ -29,7 +31,9 @@ export default function Pricing() {
     document.body.appendChild(script);
 
     return () => {
-      document.body.removeChild(script);
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
     };
   }, []);
 
@@ -39,7 +43,7 @@ export default function Pricing() {
       return;
     }
 
-    if (hasActiveSubscription) {
+    if (hasActiveSubscription && plan.duration !== 'lifetime') {
       alert('You already have an active subscription!');
       return;
     }
@@ -52,23 +56,42 @@ export default function Pricing() {
     setLoading(plan.id);
 
     try {
+      // Determine the price based on plan
+      let amount = plan.price;
+      if (plan.duration === 'yearly' && plan.yearlyPrice) {
+        amount = plan.yearlyPrice;
+      }
+
       // Create subscription record in Firestore
-      const subscriptionRef = await addDoc(collection(db, 'subscriptions'), {
+      const subscriptionData: any = {
         userId: user.id,
-        planType: 'lifetime' as const,
-        amount: plan.price,
+        planType: plan.duration,
+        amount: amount,
         status: 'created' as const,
         purchaseDate: Timestamp.now(),
         createdAt: Timestamp.now(),
-      });
+      };
+
+      // Add expiry date for monthly and yearly plans
+      if (plan.duration === 'monthly') {
+        const expiresAt = new Date();
+        expiresAt.setMonth(expiresAt.getMonth() + 1);
+        subscriptionData.expiresAt = Timestamp.fromDate(expiresAt);
+      } else if (plan.duration === 'yearly') {
+        const expiresAt = new Date();
+        expiresAt.setFullYear(expiresAt.getFullYear() + 1);
+        subscriptionData.expiresAt = Timestamp.fromDate(expiresAt);
+      }
+
+      const subscriptionRef = await addDoc(collection(db, 'subscriptions'), subscriptionData);
 
       // Razorpay options
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
-        amount: plan.price * 100, // Amount in paise
+        amount: amount * 100, // Amount in paise
         currency: 'INR',
         name: 'Gymmer',
-        description: `${plan.name} - ${plan.duration}`,
+        description: `${plan.name} - ${plan.period}`,
         image: '/logo.svg',
         handler: async function (response: any) {
           try {
@@ -121,7 +144,10 @@ export default function Pricing() {
             You Have Active Subscription!
           </h1>
           <p className="text-gray-600 mb-2">
-            Plan: <span className="font-semibold">Lifetime Access</span>
+            Plan: <span className="font-semibold">
+              {subscription.planType === 'lifetime' ? 'Lifetime Access' : 
+               subscription.planType === 'yearly' ? 'Yearly Plan' : 'Monthly Plan'}
+            </span>
           </p>
           <p className="text-gray-600 mb-8">
             Purchased: <span className="font-semibold">{subscription.purchaseDate.toDate().toLocaleDateString()}</span>
@@ -138,113 +164,143 @@ export default function Pricing() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-16">
+    <div className="min-h-screen bg-black py-16 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h1 className="text-5xl font-extra-bold text-gray-900 mb-4">
-            Get Lifetime Access
-          </h1>
-          <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-            One-time payment of just ₹10 for unlimited lifetime access to 70+ verified gyms across Bangalore!
+        <div className="text-center space-y-4 mb-12">
+          <h2 className="text-4xl font-bold tracking-tight sm:text-5xl text-white">
+            Simple, Transparent Pricing
+          </h2>
+          <p className="text-gray-300 text-lg max-w-2xl mx-auto">
+            Choose the plan that works for you. All plans include access to our platform, gym listings, and dedicated support.
           </p>
         </div>
 
-        {/* Pricing Card */}
-        <div className="max-w-xl mx-auto">
-          {PRICING_PLANS.map((plan) => (
-            <div
-              key={plan.id}
-              className={`relative bg-white rounded-2xl shadow-xl p-8 ${
-                plan.popular ? 'border-4 border-primary' : 'border border-gray-200'
-              }`}
-            >
-              {plan.popular && (
-                <div className="absolute -top-4 left-1/2 transform -translate-x-1/2">
-                  <span className="bg-primary text-white px-6 py-1 rounded-full text-sm font-bold">
-                    MOST POPULAR
-                  </span>
-                </div>
-              )}
+        
 
-              <div className="text-center mb-8">
-                <h3 className="text-2xl font-bold text-gray-900 mb-2">{plan.name}</h3>
-                <div className="flex items-baseline justify-center mb-4">
-                  <span className="text-6xl font-extra-bold text-primary">₹{plan.price}</span>
-                  <span className="text-gray-600 ml-2 text-xl">only</span>
-                </div>
-                <p className="text-sm text-green-600 font-semibold">
-                  🎉 One-time payment, lifetime access!
-                </p>
-              </div>
+        {/* Pricing Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
+          {PRICING_PLANS.map((plan, index) => {
+            const displayPrice = plan.yearlyPrice && plan.duration === 'yearly'
+              ? plan.yearlyPrice
+              : plan.price;
 
-              <ul className="space-y-4 mb-8">
-                {plan.features.map((feature, index) => (
-                  <li key={index} className="flex items-start">
-                    <Check className="w-5 h-5 text-primary mr-3 flex-shrink-0 mt-0.5" />
-                    <span className="text-gray-700">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                onClick={() => handleSubscribe(plan)}
-                disabled={loading === plan.id || !razorpayLoaded}
-                className={`w-full py-4 rounded-lg font-bold text-lg transition-colors ${
-                  plan.popular
-                    ? 'bg-primary hover:bg-primary-dark text-white'
-                    : 'bg-gray-100 hover:bg-gray-200 text-gray-900'
-                } disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center`}
-              >
-                {loading === plan.id ? (
-                  <>
-                    <Loader className="w-5 h-5 mr-2 animate-spin" />
-                    Processing...
-                  </>
-                ) : !razorpayLoaded ? (
-                  'Loading...'
-                ) : (
-                  'Subscribe Now'
+            return (
+              <motion.div
+                key={plan.id}
+                initial={{ y: 50, opacity: 0 }}
+                whileInView={{
+                  y: plan.isPopular ? -20 : 0,
+                  opacity: 1,
+                  scale: plan.isPopular ? 1.05 : 1.0,
+                }}
+                viewport={{ once: true }}
+                transition={{
+                  duration: 0.6,
+                  type: "spring",
+                  stiffness: 100,
+                  damping: 20,
+                  delay: index * 0.1,
+                }}
+                className={cn(
+                  "rounded-2xl border p-6 bg-gray-900 text-center relative flex flex-col",
+                  plan.isPopular ? "border-primary border-2 shadow-xl" : "border-gray-700 shadow-lg",
+                  !plan.isPopular && "mt-5"
                 )}
-              </button>
-            </div>
-          ))}
+              >
+                {plan.isPopular && (
+                  <div className="absolute top-0 right-0 bg-primary py-1 px-3 rounded-bl-xl rounded-tr-xl flex items-center">
+                    <Star className="text-white h-4 w-4 fill-current" />
+                    <span className="text-white ml-1 font-semibold text-sm">
+                      Popular
+                    </span>
+                  </div>
+                )}
+
+                <div className="flex-1 flex flex-col">
+                  <p className="text-base font-semibold text-gray-300 mb-2">
+                    {plan.name}
+                  </p>
+
+                  <div className="mt-6 flex items-center justify-center gap-x-2">
+                    <span className="text-5xl font-bold tracking-tight text-white">
+                      ₹{displayPrice}
+                    </span>
+                    {plan.period !== 'lifetime' && (
+                      <span className="text-sm font-semibold leading-6 tracking-wide text-gray-400">
+                        / {plan.period}
+                      </span>
+                    )}
+                  </div>
+
+                  {plan.duration === 'yearly' && (
+                    <p className="text-xs leading-5 text-gray-400 mt-1">
+                      billed annually
+                    </p>
+                  )}
+
+                  {plan.duration === 'monthly' && (
+                    <p className="text-xs leading-5 text-gray-400 mt-1">
+                      billed monthly
+                    </p>
+                  )}
+
+                  {plan.duration === 'lifetime' && (
+                    <p className="text-xs leading-5 text-gray-400 mt-1">
+                      one-time payment
+                    </p>
+                  )}
+
+                  <ul className="mt-6 gap-3 flex flex-col text-left">
+                    {plan.features.map((feature, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <Check className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
+                        <span className="text-gray-300 text-sm">{feature}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <hr className="w-full my-6 border-gray-700" />
+
+                  <button
+                    onClick={() => handleSubscribe(plan)}
+                    disabled={loading === plan.id || !razorpayLoaded}
+                    className={cn(
+                      "w-full py-3 rounded-lg text-lg font-semibold transition-all duration-300",
+                      "transform hover:scale-105 hover:shadow-lg",
+                      plan.isPopular
+                        ? "bg-primary text-white hover:bg-primary-dark"
+                        : "bg-gray-800 text-white hover:bg-gray-700 border border-gray-700",
+                      "disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center"
+                    )}
+                  >
+                    {loading === plan.id ? (
+                      <>
+                        <Loader className="w-5 h-5 mr-2 animate-spin" />
+                        Processing...
+                      </>
+                    ) : !razorpayLoaded ? (
+                      'Loading...'
+                    ) : (
+                      plan.buttonText
+                    )}
+                  </button>
+
+                  <p className="mt-4 text-xs leading-5 text-gray-400">
+                    {plan.description}
+                  </p>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
 
         {/* Trust Indicators */}
         <div className="mt-16 text-center">
-          <p className="text-gray-600 mb-4">🔒 Secure payment powered by Razorpay</p>
-          <p className="text-sm text-gray-500">Cancel anytime. No hidden charges. 100% secure.</p>
-        </div>
-
-        {/* FAQ */}
-        <div className="mt-20 max-w-3xl mx-auto">
-          <h2 className="text-3xl font-bold text-center text-gray-900 mb-8">
-            Frequently Asked Questions
-          </h2>
-          <div className="space-y-6">
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-2">What's included in the subscription?</h3>
-              <p className="text-gray-600">
-                You get unlimited access to browse all 70+ gym listings, compare prices, save your favorites, and directly contact gym owners.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-2">Is it really just ₹10?</h3>
-              <p className="text-gray-600">
-                Yes! Just ₹10 one-time payment gives you lifetime access. No recurring charges, no subscriptions.
-              </p>
-            </div>
-            <div className="bg-white rounded-lg p-6 shadow-sm">
-              <h3 className="font-bold text-gray-900 mb-2">Is the payment secure?</h3>
-              <p className="text-gray-600">
-                Absolutely! We use Razorpay, India's most trusted payment gateway. Your payment information is encrypted and secure.
-              </p>
-            </div>
-          </div>
+          <p className="text-gray-300 mb-4">🔒 Secure payment powered by Razorpay</p>
+          <p className="text-sm text-gray-400">Cancel anytime. No hidden charges. 100% secure.</p>
         </div>
       </div>
     </div>
   );
 }
-

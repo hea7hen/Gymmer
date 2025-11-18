@@ -88,7 +88,7 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">
-          <p>&copy; 2024 Gymmer. All rights reserved. Supporting Bangalore's independent gyms.</p>
+          <p>&copy; 2025 Gymmer. All rights reserved. Supporting Bangalore's independent gyms.</p>
         </div>
       </div>
     </footer>

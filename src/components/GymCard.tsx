@@ -33,15 +33,21 @@ export default function GymCard({ gym }: GymCardProps) {
       {/* Image */}
       <div className="relative h-48 overflow-hidden rounded-t-xl">
         <img
-          src={gym.coverImage || generateGymImage(gym.name, gym.area)}
+          src={
+            gym.coverImage && 
+            !gym.coverImage.includes('unsplash.com/photo-1534438327276') 
+              ? gym.coverImage 
+              : generateGymImage(gym.id, gym.name, gym.area)
+          }
           alt={gym.name}
           className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
           loading="lazy"
           onError={(e) => {
             // Fallback to generated image if coverImage fails
             const target = e.target as HTMLImageElement;
-            if (target.src !== generateGymImage(gym.name, gym.area)) {
-              target.src = generateGymImage(gym.name, gym.area);
+            const fallbackSrc = generateGymImage(gym.id, gym.name, gym.area);
+            if (target.src !== fallbackSrc) {
+              target.src = fallbackSrc;
             }
           }}
         />

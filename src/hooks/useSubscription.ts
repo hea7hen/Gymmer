@@ -28,7 +28,16 @@ export function useSubscription() {
         ...snapshot.docs[0].data()
       } as Subscription & { id: string };
 
-      // Lifetime access - no expiry check needed
+      // Check if subscription has expired (for monthly and yearly plans)
+      if (subscription.expiresAt && subscription.planType !== 'lifetime') {
+        const now = new Date();
+        const expiresAt = subscription.expiresAt.toDate();
+        if (now > expiresAt) {
+          // Subscription has expired
+          return null;
+        }
+      }
+
       return subscription;
     },
     enabled: !!user,
